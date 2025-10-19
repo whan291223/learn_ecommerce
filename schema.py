@@ -19,13 +19,16 @@ class CategoryPublic(SQLModel):
     pass
 
 class UserBase(SQLModel):
-    pass
+    username: str
 
-class UserCreate(SQLModel):
-    pass
+class UserCreate(UserBase):
+    password: str
+    role: str
 
-class UserPublic(SQLModel):
-    pass
+class UserPublic(UserBase):
+    id: int
+    role: str
+    review: List[ReviewPublic]
 
 class ReviewBase(SQLModel):
     pass
