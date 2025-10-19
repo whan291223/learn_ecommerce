@@ -1,5 +1,11 @@
 # between database and api there should be a schema which is the filter
 # or the process between the two like hashing a password send via api
+
+# represent how data is sent or received via api (What user and client) see
+# z
+
+
+
 from typing import List, Optional
 from sqlmodel import SQLModel
 

@@ -15,3 +15,22 @@ async def create_new_product(
     product_data: ProductCreate,
     session: AsyncSession = Depends(get_session)
 ):
+    new_product = await crud_product.create_product(product_data=product_data, session=session)
+
+
+@router.get("/", response_model=List[ProductPublic])
+async def get_all_product(
+    session: AsyncSession = Depends(get_session)
+):
+    products = await crud_product.get_all_product(session=session)
+    return products
+
+@router.get("/{product_id}", response_model=ProductPublic)
+async def get_product_detail(
+    product_id: int,
+    session: AsyncSession = Depends(get_session)
+):
+    product = await crud_product.get_product_by_id(product_id=product, session=session)
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
+    return product
