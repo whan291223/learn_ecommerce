@@ -17,7 +17,7 @@ class CategoryCreate(CategoryBase):
 
 class CategoryPublic(CategoryBase):
     id: int
-    products: List[ProductPublic]
+    products: List["ProductPublic"]
 
 class UserBase(SQLModel):
     username: str
@@ -29,7 +29,7 @@ class UserCreate(UserBase): # use when create User
 class UserPublic(UserBase): # what public will see
     id: int
     role: str
-    review: List[ReviewPublic]
+    review: List["ReviewPublic"]
 
 class ReviewBase(SQLModel):
     text: str
@@ -55,4 +55,9 @@ class ProductCreate(ProductBase): #when product is create it create in some cate
 class ProductPublic(ProductBase): #the product that shown on page should contain id which contain data of product, category, list of review
     id: int
     category: CategoryPublic
-    review: List[ReviewPublic] = []
+    review: List["ReviewPublic"] = []
+
+CategoryPublic.model_rebuild()
+ProductPublic.model_rebuild()
+UserPublic.model_rebuild()
+ReviewPublic.model_rebuild()
