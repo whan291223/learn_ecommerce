@@ -10,34 +10,39 @@ from typing import List, Optional
 from sqlmodel import SQLModel
 
 class CategoryBase(SQLModel):
+    name: str
+
+class CategoryCreate(CategoryBase):
     pass
 
-class CategoryCreate(SQLModel):
-    pass
-
-class CategoryPublic(SQLModel):
-    pass
+class CategoryPublic(CategoryBase):
+    id: int
+    products: List[ProductPublic]
 
 class UserBase(SQLModel):
     username: str
 
-class UserCreate(UserBase):
+class UserCreate(UserBase): # use when create User
     password: str
     role: str
 
-class UserPublic(UserBase):
+class UserPublic(UserBase): # what public will see
     id: int
     role: str
     review: List[ReviewPublic]
 
 class ReviewBase(SQLModel):
-    pass
+    text: str
+    rating: int
 
-class ReviewCreate(SQLModel):
-    pass
-
-class ReviewPublic(SQLModel):
-    pass
+class ReviewCreate(ReviewBase):
+    user_id: int
+    product_id: int
+    
+class ReviewPublic(ReviewBase):
+    id: int
+    user: UserPublic
+    product: ProductPublic
 
 class ProductBase(SQLModel): # didn't use table = True because we didn't want to create the table we need only mediump between database
     name: str 
