@@ -46,7 +46,7 @@ class Review(SQLModel, table=True):
     text: str
     rating: int
     
-    user_id: int = Field(foreign_key="user.id")
+    user_id: int = Field(foreign_key="user.id") #reviews belond to user therefore it should have foreigh key here
     user: User = Relationship(back_populates="review")
     
     product_id: int = Field(foreign_key="product.id")
