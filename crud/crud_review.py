@@ -12,12 +12,15 @@ async def create_review(review_data: ReviewCreate, session: AsyncSession):
     await session.refresh()
     return db_review
 
-async def get_product_reviews(product_id: int,session: AsyncSession) -> List[Review]:
-    statement = select(Review).where(Review.product_id == product_id)
-    result = await session.exec(statement)
-    return result.all()
+async def get_review(review_id: int, session: AsyncSession):
+    return await session.get(Review, review_id) #can only use session.get where the query parameter is primary key
+    
+# async def get_product_reviews(product_id: int,session: AsyncSession) -> List[Review]:
+#     statement = select(Review).where(Review.product_id == product_id)
+#     result = await session.exec(statement)
+#     return result.all()
 
-async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
-    statement = select(Review).where(Review.user_id == user_id)
-    result = await session.exec(statement)
-    return result.all()
+# async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
+#     statement = select(Review).where(Review.user_id == user_id)
+#     result = await session.exec(statement)
+#     return result.all()

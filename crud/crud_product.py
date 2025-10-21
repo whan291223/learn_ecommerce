@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from model.models import Product
+from model.models import Product, Review
 from schema import ProductBase, ProductCreate
 
 async def create_product(product_data: ProductCreate, session: AsyncSession) -> Product:
@@ -21,3 +21,8 @@ async def get_product_by_id(product_id: int, session: AsyncSession) -> Optional[
     statement = select(Product).where(Product.id == product_id)
     result = await session.exec(statement)
     return result.one_or_none()
+
+async def get_product_reviews(product_id: int,session: AsyncSession) -> List[Review]:
+    statement = select(Review).where(Review.product_id == product_id)
+    result = await session.exec(statement)
+    return result.all()

@@ -1,23 +1,26 @@
-from typing import List
+from typing import List, Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from model.models import User
-from schema import UserBase, UserCreate
+from model.models import User, Review
+from schema import UserCreate
 
-async def create_product(product_data: ProductCreate, session: AsyncSession) -> Product:
-    db_product = Product.model_validate(product_data)
-    session.add(db_product)
+async def create_user(userdata: UserCreate, session: AsyncSession) -> User:
+    db_user = User.model_validate(userdata)
+    session.add(db_user)
     await session.commit()
-    await session.refresh(db_product) # fetch product
-    return db_product
+    await session.refresh()
+    return db_user
 
-async def get_all_product(session: AsyncSession) -> List[Product]:
-    statment = select(Product)
-    result = await session.exec(statment)
+async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
+    statement = select(Review).where(Review.user_id == user_id)
+    result = await session.exec(statement)
     return result.all()
 
-async def get_product_by_id(product_id: int, session: AsyncSession) -> Product:
-    statement = select(Product).where(Product.id == product_id)
+async def get_all_user(session: AsyncSession) -> List[User]:
+    statement = select(User)
     result = await session.exec(statement)
-    return result.one_or_none
+    return result.all()
+
+async def get_user_by_id(user_id: int, session: AsyncSession) -> User:
+    return await session.get(User, user_id)
