@@ -6,22 +6,21 @@ from core.db import get_session
 from crud import crud_product
 from schema import ProductCreate, ProductPublic
 
-router = APIRouter() # router will initiate path for api automaticly
+router = APIRouter(prefix="product", tags="product") # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
 
-@router.post("/", status_code=status.HTTP_201_CREATED,
-             response_model=ProductPublic)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ProductPublic)
 async def create_new_product(
     product_data: ProductCreate,
     session: AsyncSession = Depends(get_session)
-):
+) -> ProductPublic:
     new_product = await crud_product.create_product(product_data=product_data, session=session)
-
+    return new_product
 
 @router.get("/", response_model=List[ProductPublic])
 async def get_all_product(
     session: AsyncSession = Depends(get_session)
-):
+) -> List[ProductPublic]:
     products = await crud_product.get_all_product(session=session)
     return products
 
@@ -29,7 +28,7 @@ async def get_all_product(
 async def get_product_detail(
     product_id: int,
     session: AsyncSession = Depends(get_session)
-):
+) -> ProductPublic:
     product = await crud_product.get_product_by_id(product_id=product, session=session)
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
