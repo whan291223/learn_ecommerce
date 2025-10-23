@@ -12,15 +12,15 @@ async def create_user(userdata: UserCreate, session: AsyncSession) -> User:
     await session.refresh()
     return db_user
 
-async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
-    statement = select(Review).where(Review.user_id == user_id)
-    result = await session.exec(statement)
-    return result.all()
-
-async def get_all_user(session: AsyncSession) -> List[User]:
+async def get_all_users(session: AsyncSession) -> List[User]:
     statement = select(User)
     result = await session.exec(statement)
     return result.all()
 
-async def get_user_by_id(user_id: int, session: AsyncSession) -> User:
+async def get_user_by_id(user_id: int, session: AsyncSession) -> Optional[User]:
     return await session.get(User, user_id)
+
+async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
+    statement = select(Review).where(Review.user_id == user_id)
+    result = await session.exec(statement)
+    return result.all()

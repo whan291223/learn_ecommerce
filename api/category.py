@@ -6,7 +6,7 @@ from core.db import get_session
 from crud import crud_category
 from schema import CategoryCreate, CategoryPublic, ProductPublic
 
-router = APIRouter(prefix="categories", tags=['categories'])
+router = APIRouter(prefix="/categories", tags=['categories'])
 
 @router.post("/", status_code=status.HTTP_201_CREATED,
              response_model=CategoryPublic)
@@ -30,12 +30,18 @@ async def get_category_by_id(
     session: AsyncSession = Depends(get_session)
 ) -> CategoryPublic:
     category = await crud_category.get_category_by_id(category_id=category_id, session=session)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
     return category
 
-@router.get("/{category_name}/products}", response_model=List[ProductPublic])
+@router.get("/{category_name}/products", response_model=List[ProductPublic])
 async def get_category_products(
     category_name: str,
     session: AsyncSession = Depends(get_session)
 ) -> List[ProductPublic]:
+    #step1 validate if category name is valid
+    category = await crud_category.get_category_by_name (category_name=category_name)
+    if not category:
+        raise HTTPException(status_code=404, detail=f"Category name {category_name} not found")
     products = await crud_category.get_category_products(category_name=category_name, session=session)
     return products

@@ -4,9 +4,9 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
 from crud import crud_product
-from schema import ProductCreate, ProductPublic
+from schema import ProductCreate, ProductPublic, ReviewPublic
 
-router = APIRouter(prefix="product", tags="product") # router will initiate path for api automaticly
+router = APIRouter(prefix="/product", tags="product") # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=ProductPublic)
@@ -33,3 +33,11 @@ async def get_product_detail(
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
     return product
+
+@router.get("/{product_id}/reviews", response_model=List[ReviewPublic])
+async def get_product_reviews(
+    product_id: int,
+    session: AsyncSession = Depends(get_session)
+) -> List[ReviewPublic]:
+    reviews = await crud_product.get_product_reviews(product_id=product_id, session=session)
+    return reviews
