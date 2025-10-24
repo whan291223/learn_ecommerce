@@ -4,9 +4,15 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
-
+from model.models import SQLModel
+import sys
 from alembic import context
+
+if sys.platform == "win32":
+    # Psycopg is incompatible with the default ProactorEventLoop on Windows.
+    # We must explicitly set the compatible WindowsSelectorEventLoopPolicy.
+    print("Setting WindowsSelectorEventLoopPolicy for Alembic/Psycopg compatibility on Windows...")
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,7 +27,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
