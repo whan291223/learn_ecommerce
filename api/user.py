@@ -20,7 +20,7 @@ async def create_user(
 async def get_all_users(
     session: AsyncSession = Depends(get_session)
 ) -> List[UserPublic]:
-    users = await crud_user.get_all_user(session=session)
+    users = await crud_user.get_all_users(session=session)
     return users
 
 @router.get("/{user_id}", response_model=UserPublic)

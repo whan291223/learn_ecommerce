@@ -29,7 +29,7 @@ class UserCreate(UserBase): # use when create User
 class UserPublic(UserBase): # what public will see
     id: int
     role: str
-    review: List["ReviewPublic"]
+    reviews: List["ReviewPublic"]
 
 class ReviewBase(SQLModel):
     text: str

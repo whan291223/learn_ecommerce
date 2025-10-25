@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from model.models import User, Review
 from schema import UserCreate
@@ -9,11 +10,11 @@ async def create_user(userdata: UserCreate, session: AsyncSession) -> User:
     db_user = User.model_validate(userdata)
     session.add(db_user)
     await session.commit()
-    await session.refresh()
+    await session.refresh(db_user)
     return db_user
 
 async def get_all_users(session: AsyncSession) -> List[User]:
-    statement = select(User)
+    statement = select(User).options(selectinload(User.reviews))
     result = await session.exec(statement)
     return result.all()
 

@@ -6,7 +6,7 @@ from core.db import get_session
 from crud import crud_product
 from schema import ProductCreate, ProductPublic, ReviewPublic
 
-router = APIRouter(prefix="/product", tags="product") # router will initiate path for api automaticly
+router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=ProductPublic)

@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from sqlalchemy.orm import sessionmaker
 from .config import settings
@@ -17,7 +17,9 @@ async def get_session(): # using async and await mean that if there is paralell 
         try:
             yield session
             await session.commit()
-        except Exception:
+        except Exception as e:
+            print(f"Got error: {e}")
             await session.rollback() # remove all changes and go to zero
+            raise
         finally:
             await session.close()

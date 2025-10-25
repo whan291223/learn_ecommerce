@@ -30,7 +30,7 @@ class Product(SQLModel, table=True):
     price: float
     
     category_id: int = Field(foreign_key="category.id")
-    category: "Category" = Relationship(back_populates="product")
+    category: Category = Relationship(back_populates="products")
     reviews: List["Review"] = Relationship(back_populates="product")
 
 class Category(SQLModel, table=True):
@@ -47,7 +47,7 @@ class Review(SQLModel, table=True):
     rating: int
     
     user_id: int = Field(foreign_key="user.id") #reviews belond to user therefore it should have foreigh key here
-    user: User = Relationship(back_populates="review")
+    user: User = Relationship(back_populates="reviews")
     
     product_id: int = Field(foreign_key="product.id")
-    product: Product = Relationship(back_populates="review")
+    product: Product = Relationship(back_populates="reviews")
