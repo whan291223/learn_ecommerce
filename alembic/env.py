@@ -8,12 +8,6 @@ from model.models import SQLModel
 import sys
 from alembic import context
 
-if sys.platform == "win32":
-    # Psycopg is incompatible with the default ProactorEventLoop on Windows.
-    # We must explicitly set the compatible WindowsSelectorEventLoopPolicy.
-    print("Setting WindowsSelectorEventLoopPolicy for Alembic/Psycopg compatibility on Windows...")
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -86,8 +80,13 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-
-    asyncio.run(run_async_migrations())
+    if sys.platform == "win32":
+        # Psycopg is incompatible with the default ProactorEventLoop on Windows.
+        # Use loop_factory to explicitly create a SelectorEventLoop.
+        print("Using SelectorEventLoop via loop_factory for Alembic/Psycopg compatibility on Windows...")
+        asyncio.run(run_async_migrations(), loop_factory=asyncio.SelectorEventLoop)
+    else:
+        asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():
