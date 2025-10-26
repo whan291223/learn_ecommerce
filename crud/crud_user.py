@@ -15,22 +15,29 @@ async def create_user(userdata: UserCreate, session: AsyncSession) -> User:
         await session.commit()
         await session.refresh(db_user)
         return db_user
-    except IntegrityError:
+    except IntegrityError: #instead of just raise HTTP on this move to raise in api folder
         await session.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already exists."
-        )
+        raise 
 
 async def get_all_users(session: AsyncSession) -> List[User]:
     statement = select(User).options(selectinload(User.reviews))
     result = await session.exec(statement)
     return result.all()
 
+# async def get_user_by_id(user_id: int, session: AsyncSession) -> Optional[User]:
+#     return await session.get(User, user_id)
 async def get_user_by_id(user_id: int, session: AsyncSession) -> Optional[User]:
-    return await session.get(User, user_id)
+    statement = select(User).where(User.id == user_id).options(selectinload(User.reviews))
+    result = await session.exec(statement)
+    return result.one_or_none()
 
 async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
-    statement = select(Review).where(Review.user_id == user_id)
-    result = await session.exec(statement)
-    return result.all()
+    user_statement = select(User).where(User.id == user_id).options(selectinload(User.reviews))
+    user_result = await session.exec(user_statement)
+    user = user_result.one_or_none()
+    if not user:
+        raise ValueError("User not found")
+    
+    # reivew_statement = select(Review).where(Review.user_id == user_id)
+    # review_result = await session.exec(reivew_statement)
+    return user.reviews
