@@ -1,6 +1,8 @@
 from typing import List, Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 
 from model.models import Category, Product
 from schema import CategoryCreate
@@ -8,12 +10,16 @@ from schema import CategoryCreate
 async def create_category(category_data: CategoryCreate, session: AsyncSession) -> Category:
     db_category = Category.model_validate(category_data)
     session.add(db_category)
-    await session.commit()
-    await session.refresh(db_category) # fetch product
-    return db_category
+    try:
+        await session.commit()
+        await session.refresh(db_category) # fetch product
+        return db_category
+    except IntegrityError:
+        await session.rollback()
+        raise
 
 async def get_all_category(session: AsyncSession) -> List[Category]:
-    statement = select(Category)
+    statement = select(Category).options(selectinload(Category.products))
     result = await session.exec(statement)
     return result.all()
 

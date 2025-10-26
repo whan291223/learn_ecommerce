@@ -1,10 +1,10 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel.ext.asyncio.session import AsyncSession
-
+from sqlalchemy.exc import IntegrityError
 from core.db import get_session
 from crud import crud_category
-from schema import CategoryCreate, CategoryPublic, ProductPublic
+from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic
 
 router = APIRouter(prefix="/categories", tags=['categories'])
 
@@ -14,13 +14,20 @@ async def create_new_category(
     category_data: CategoryCreate,
     session: AsyncSession = Depends(get_session)
 ) -> CategoryPublic:
-    new_category = await crud_category.create_category(category_data=category_data, session=session)
-    return new_category
+    try:
+        new_category = await crud_category.create_category(category_data=category_data, session=session)
+        return CategoryPublic(
+            name = new_category.name,
+            id=new_category.id,
+            products=[]
+        )
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"There is already have {category_data}")
 
-@router.get("/", response_model=List[CategoryPublic])
+@router.get("/", response_model=List[CategoryWithProductPublic])
 async def get_all_category(
     session: AsyncSession = Depends(get_session)
-) -> List[CategoryPublic]:
+) -> List[CategoryWithProductPublic]:
     categories = await crud_category.get_all_category(session)
     return categories
 

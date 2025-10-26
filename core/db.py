@@ -18,7 +18,6 @@ async def get_session(): # using async and await mean that if there is paralell 
             yield session
             await session.commit()
         except Exception as e:
-            print(f"Got error: {e}")
             await session.rollback() # remove all changes and go to zero
             raise
         finally:

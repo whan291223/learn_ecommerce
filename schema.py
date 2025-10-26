@@ -9,16 +9,6 @@
 from typing import List, Optional
 from sqlmodel import SQLModel
 
-class CategoryBase(SQLModel):
-    name: str
-
-class CategoryCreate(CategoryBase):
-    pass
-
-class CategoryPublic(CategoryBase):
-    id: int
-    products: List["ProductPublic"]
-
 class UserBase(SQLModel):
     username: str
 
@@ -57,7 +47,23 @@ class ProductPublic(ProductBase): #the product that shown on page should contain
     category: CategoryPublic
     review: List["ReviewPublic"] = []
 
+class ProductWithoutCategory(ProductBase):
+    id: int
+class CategoryBase(SQLModel):
+    name: str
+
+class CategoryCreate(CategoryBase):
+    pass
+
+class CategoryPublic(CategoryBase):
+    id: int
+
+class CategoryWithProductPublic(CategoryBase):
+    id: int
+    products: List["ProductWithoutCategory"]
+
 CategoryPublic.model_rebuild()
 ProductPublic.model_rebuild()
 UserPublic.model_rebuild()
 ReviewPublic.model_rebuild()
+CategoryWithProductPublic.model_rebuild()
