@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from core.db import get_session
 from crud import crud_product
@@ -14,13 +15,21 @@ async def create_new_product(
     product_data: ProductCreate,
     session: AsyncSession = Depends(get_session)
 ) -> ProductPublic:
-    new_product = await crud_product.create_product(product_data=product_data, session=session)
-    return new_product
+    try:
+        new_product = await crud_product.create_product(product_data=product_data, session=session)
+        return new_product
+    except IntegrityError as integrity_error:
+        if hasattr(integrity_error.orig, "diag") and getattr(integrity_error.orig.diag, "message_detail", None):
+            detail = integrity_error.orig.diag.message_detail
+        else:
+            detail = str(integrity_error.orig)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
 @router.get("/", response_model=List[ProductPublic])
 async def get_all_product(
     session: AsyncSession = Depends(get_session)
 ) -> List[ProductPublic]:
+    # TODO this still fail
     products = await crud_product.get_all_product(session=session)
     return products
 

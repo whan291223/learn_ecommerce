@@ -1,6 +1,8 @@
 from typing import List, Optional
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import IntegrityError
 
 from model.models import Product, Review
 from schema import ProductCreate
@@ -8,12 +10,16 @@ from schema import ProductCreate
 async def create_product(product_data: ProductCreate, session: AsyncSession) -> Product:
     db_product = Product.model_validate(product_data)
     session.add(db_product)
-    await session.commit()
-    await session.refresh(db_product) # fetch product
+    try:
+        await session.commit()
+        await session.refresh(db_product) # fetch product
+    except IntegrityError:
+        await session.rollback()
+        raise
     return db_product
 
 async def get_all_product(session: AsyncSession) -> List[Product]:
-    statement = select(Product)
+    statement = select(Product).options(selectinload(Product.category))
     result = await session.exec(statement)
     return result.all()
 
