@@ -19,12 +19,12 @@ async def create_product(product_data: ProductCreate, session: AsyncSession) -> 
     return db_product
 
 async def get_all_product(session: AsyncSession) -> List[Product]:
-    statement = select(Product).options(selectinload(Product.category))
+    statement = select(Product).options(selectinload(Product.category), selectinload(Product.reviews))
     result = await session.exec(statement)
     return result.all()
 
 async def get_product_by_id(product_id: int, session: AsyncSession) -> Optional[Product]:
-    statement = select(Product).where(Product.id == product_id)
+    statement = select(Product).where(Product.id == product_id).options(selectinload(Product.category), selectinload(Product.reviews))
     result = await session.exec(statement)
     return result.one_or_none()
 

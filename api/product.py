@@ -5,16 +5,16 @@ from sqlalchemy.exc import IntegrityError
 
 from core.db import get_session
 from crud import crud_product
-from schema import ProductCreate, ProductPublic, ReviewPublic
+from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic
 
 router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ProductPublic)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ProductCategoryID)
 async def create_new_product(
     product_data: ProductCreate,
     session: AsyncSession = Depends(get_session)
-) -> ProductPublic:
+) -> ProductCategoryID: #fix add default factoty field for reviews, and use differrent schema for show only category_id
     try:
         new_product = await crud_product.create_product(product_data=product_data, session=session)
         return new_product
@@ -29,7 +29,6 @@ async def create_new_product(
 async def get_all_product(
     session: AsyncSession = Depends(get_session)
 ) -> List[ProductPublic]:
-    # TODO this still fail
     products = await crud_product.get_all_product(session=session)
     return products
 
@@ -38,7 +37,7 @@ async def get_product_detail(
     product_id: int,
     session: AsyncSession = Depends(get_session)
 ) -> ProductPublic:
-    product = await crud_product.get_product_by_id(product_id=product, session=session)
+    product = await crud_product.get_product_by_id(product_id=product_id, session=session)
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
     return product
@@ -48,5 +47,8 @@ async def get_product_reviews(
     product_id: int,
     session: AsyncSession = Depends(get_session)
 ) -> List[ReviewPublic]:
-    reviews = await crud_product.get_product_reviews(product_id=product_id, session=session)
-    return reviews
+    product = await crud_product.get_product_by_id(product_id=product_id, session=session)
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
+
+    return product.reviews
