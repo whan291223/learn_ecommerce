@@ -19,7 +19,7 @@ class UserCreate(UserBase): # use when create User
 class UserPublic(UserBase): # what public will see
     id: int
     role: str
-    reviews: List["ReviewPublic"]
+    reviews: List["ReviewPublic"] = Field(default_factory=list)
 
 class ReviewBase(SQLModel):
     text: str
@@ -64,7 +64,7 @@ class CategoryPublic(CategoryBase):
 
 class CategoryWithProductPublic(CategoryBase):
     id: int
-    products: List["ProductWithoutCategory"]
+    products: List["ProductWithoutCategory"] = Field(default_factory=list)
 
 CategoryPublic.model_rebuild()
 ProductPublic.model_rebuild()
