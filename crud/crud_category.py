@@ -18,8 +18,13 @@ async def create_category(category_data: CategoryCreate, session: AsyncSession) 
         await session.rollback()
         raise
 
-async def get_all_category(session: AsyncSession) -> List[Category]:
+async def get_all_category_with_product(session: AsyncSession) -> List[Category]:
     statement = select(Category).options(selectinload(Category.products))
+    result = await session.exec(statement)
+    return result.all()
+
+async def get_all_category(session: AsyncSession) -> list[Category]:
+    statement = select(Category)
     result = await session.exec(statement)
     return result.all()
 

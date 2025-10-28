@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from core.db import get_session
 from crud import crud_category
 from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic
-
+#TODO test category api
 router = APIRouter(prefix="/categories", tags=['categories'])
 
 @router.post("/", status_code=status.HTTP_201_CREATED,
@@ -24,10 +24,17 @@ async def create_new_category(
     except IntegrityError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"There is already have {category_data}")
 
-@router.get("/", response_model=List[CategoryWithProductPublic])
+@router.get("/with_products", response_model=List[CategoryWithProductPublic])
 async def get_all_category(
     session: AsyncSession = Depends(get_session)
 ) -> List[CategoryWithProductPublic]:
+    categories = await crud_category.get_all_category_with_product(session)
+    return categories
+
+@router.get("/", response_model=List[CategoryPublic])
+async def get_all_category(
+    session: AsyncSession = Depends(get_session)
+) -> List[CategoryPublic]:
     categories = await crud_category.get_all_category(session)
     return categories
 
