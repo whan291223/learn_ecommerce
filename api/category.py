@@ -4,8 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from core.db import get_session
 from crud import crud_category
-from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic
-#TODO test category api
+from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic, ProductWitoutCategory
 router = APIRouter(prefix="/categories", tags=['categories'])
 
 @router.post("/", status_code=status.HTTP_201_CREATED,
@@ -48,14 +47,14 @@ async def get_category_by_id(
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
-@router.get("/{category_name}/products", response_model=List[ProductPublic])
+@router.get("/{category_name}/products", response_model=List[ProductWitoutCategory])
 async def get_category_products(
     category_name: str,
     session: AsyncSession = Depends(get_session)
-) -> List[ProductPublic]:
+) -> List[ProductWitoutCategory]:
     #step1 validate if category name is valid
-    category = await crud_category.get_category_by_name(category_name=category_name, session=session)
+    #TODO still error the productpublic seem to missing greenlet
+    category = await crud_category.get_category_w_load_products(category_name=category_name, session=session)
     if not category:
-        raise HTTPException(status_code=404, detail=f"Category name {category_name} not found")
-    products = await crud_category.get_category_products(category_name=category_name, session=session)
-    return products
+        raise HTTPException(status_code=404, detail=f"Category name '{category_name}' not found")
+    return category.products
