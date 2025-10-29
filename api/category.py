@@ -53,7 +53,6 @@ async def get_category_products(
     session: AsyncSession = Depends(get_session)
 ) -> List[ProductWitoutCategory]:
     #step1 validate if category name is valid
-    #TODO still error the productpublic seem to missing greenlet
     category = await crud_category.get_category_w_load_products(category_name=category_name, session=session)
     if not category:
         raise HTTPException(status_code=404, detail=f"Category name '{category_name}' not found")

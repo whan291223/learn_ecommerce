@@ -50,6 +50,8 @@ async def get_user_reviews(
     user_id: int,
     session: AsyncSession = Depends(get_session)
 ) -> List[ReviewPublic]:
+# TODO need to test this and change response model to ReviewsOfUser
+
     try:
         reviews = await crud_user.get_user_reviews(user_id=user_id, session=session)
         return reviews

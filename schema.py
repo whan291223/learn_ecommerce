@@ -28,7 +28,18 @@ class ReviewBase(SQLModel):
 class ReviewCreate(ReviewBase):
     user_id: int
     product_id: int
-    
+
+class ReviewAfterCreate(ReviewBase):
+    id: int
+    user_id: int
+    product_id: int
+
+class ReviewsOfProduct(ReviewBase):
+    user_id: int
+
+class ReviewsOfUser(ReviewBase):
+    product_id: int
+
 class ReviewPublic(ReviewBase):
     id: int
     user: UserPublic

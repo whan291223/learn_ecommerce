@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from core.db import get_session
 from crud import crud_product
-from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic
+from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewsOfProduct
 
 router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
@@ -42,11 +42,11 @@ async def get_product_detail(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
     return product
 
-@router.get("/{product_id}/reviews", response_model=List[ReviewPublic])
+@router.get("/{product_id}/reviews", response_model=List[ReviewsOfProduct])
 async def get_product_reviews(
     product_id: int,
     session: AsyncSession = Depends(get_session)
-) -> List[ReviewPublic]:
+) -> List[ReviewsOfProduct]:
     product = await crud_product.get_product_by_id(product_id=product_id, session=session)
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")

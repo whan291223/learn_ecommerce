@@ -4,15 +4,15 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from core.db import get_session
 from crud import crud_review
-from schema import ReviewCreate, ReviewPublic
+from schema import ReviewCreate, ReviewAfterCreate, ReviewPublic
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ReviewPublic)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ReviewAfterCreate)
 async def create_review(
     review_data: ReviewCreate, 
     session: AsyncSession = Depends(get_session)
-    ) -> ReviewCreate:
+    ) -> ReviewAfterCreate:
     review = await crud_review.create_review(review_data=review_data, session=session)
     return review
 
