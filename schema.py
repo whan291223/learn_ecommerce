@@ -29,12 +29,8 @@ class ReviewCreate(ReviewBase):
     user_id: int
     product_id: int
 
-class ReviewAfterCreate(ReviewBase):
-    id: int
-    user_id: int
-    product_id: int
-
 class ReviewsOfProduct(ReviewBase):
+    id: int
     user_id: int
 
 class ReviewsOfUser(ReviewBase):
@@ -42,8 +38,8 @@ class ReviewsOfUser(ReviewBase):
 
 class ReviewPublic(ReviewBase):
     id: int
-    user: UserPublic
-    product: ProductPublic
+    user_id: int
+    product_id: int
 
 class ProductBase(SQLModel): # didn't use table = True because we didn't want to create the table we need only mediump between database
     name: str 
