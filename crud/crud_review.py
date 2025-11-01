@@ -39,3 +39,9 @@ async def get_all_reviews(session: AsyncSession) -> List[Review]:
 #     statement = select(Review).where(Review.user_id == user_id)
 #     result = await session.exec(statement)
 #     return result.all()
+
+#TODO add remove reivews and 
+
+
+
+# TODO add update reviews

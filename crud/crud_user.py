@@ -41,3 +41,5 @@ async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
     # reivew_statement = select(Review).where(Review.user_id == user_id)
     # review_result = await session.exec(reivew_statement)
     return user.reviews
+
+#TODO remove user and their relavent??

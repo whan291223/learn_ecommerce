@@ -52,3 +52,14 @@ async def get_product_reviews(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with id {product_id} not found!")
 
     return product.reviews
+
+@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product(
+    product_id: int,
+    session: AsyncSession = Depends(get_session)
+):
+    try:
+        await crud_product.delete_product(product_id=product_id, session=session)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=f"Product id: {product_id} not found")

@@ -42,3 +42,6 @@ async def get_category_w_load_products(category_name: str, session: AsyncSession
     statement = select(Category).where(Category.name == category_name).options(selectinload(Category.products))
     result = await session.exec(statement)
     return result.one_or_none()
+
+
+#TODO remove category ... only if that category no longer have product!

@@ -52,16 +52,16 @@ class ProductCreate(ProductBase): #when product is create it create in some cate
 class ProductPublic(ProductBase): #the product that shown on page should contain id which contain data of product, category, list of review
     id: int
     category: CategoryPublic
-    review: List["ReviewPublic"] = Field(default_factory=list)
+    reviews: List["ReviewPublic"] = Field(default_factory=list)
 
 class ProductWitoutCategory(ProductBase): #Product list when category shown
     id: int
-    review: List["ReviewPublic"] = Field(default_factory=list)
+    reviews: List["ReviewPublic"] = Field(default_factory=list)
 
 class ProductCategoryID(ProductBase):
     id: int
     category_id: int
-    review: List["ReviewPublic"] = Field(default_factory=list)
+    reviews: List["ReviewPublic"] = Field(default_factory=list)
 class ProductWithoutCategory(ProductBase):
     id: int
 class CategoryBase(SQLModel):
