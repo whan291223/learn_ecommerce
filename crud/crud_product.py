@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
 from model.models import Product, Review
-from schema import ProductCreate
+from schema import ProductCreate, ProductUpdate
 
 async def create_product(product_data: ProductCreate, session: AsyncSession) -> Product:
     db_product = Product.model_validate(product_data)
@@ -38,7 +38,6 @@ async def get_product_reviews(product_id: int,session: AsyncSession) -> List[Rev
     result = await session.exec(statement)
     return result.all()
 
-# TODO add delete product
 async def delete_product(product_id: int, session: AsyncSession):
     statement = select(Product).where(Product.id == product_id)
     result = await session.exec(statement)
@@ -51,4 +50,28 @@ async def delete_product(product_id: int, session: AsyncSession):
     except:
         await session.rollback()
         raise
-# TODO add update product
+
+async def update_product(product_data: ProductUpdate, session: AsyncSession) -> Product:
+    statement = select(Product).where(Product.id == product_data.id).options(
+        selectinload(Product.reviews)
+    )
+    result = await session.exec(statement)
+    product = result.one_or_none()
+
+    if not product:
+        raise ValueError
+
+    for key, value in product_data.model_dump().items():
+        setattr(product, key, value)
+    
+    session.add(product)
+    try:
+        await session.commit()
+        await session.refresh(product) # fetch product
+    except IntegrityError:
+        await session.rollback()
+        raise
+    return product
+
+    
+    

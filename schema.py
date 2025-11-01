@@ -49,6 +49,10 @@ class ProductBase(SQLModel): # didn't use table = True because we didn't want to
 class ProductCreate(ProductBase): #when product is create it create in some category
     category_id: int
 
+class ProductUpdate(ProductBase): #when product is create it create in some category
+    id: int
+    category_id: int
+
 class ProductPublic(ProductBase): #the product that shown on page should contain id which contain data of product, category, list of review
     id: int
     category: CategoryPublic

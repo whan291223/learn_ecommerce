@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from core.db import get_session
 from crud import crud_product
-from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic
+from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic, ProductUpdate
 
 router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
@@ -63,3 +63,31 @@ async def delete_product(
     except ValueError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail=f"Product id: {product_id} not found")
+
+@router.put("/", response_model=ProductCategoryID)
+async def update_product(
+    product_data: ProductUpdate,
+    session: AsyncSession = Depends(get_session)
+) -> ProductCategoryID:
+    try:
+        product = await crud_product.update_product(product_data=product_data, session=session)
+        return product
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail=f"Product id: {product_data.id} not found")
+    except IntegrityError as intergrity_error:
+        if hasattr(intergrity_error.orig, "diag") and getattr(intergrity_error.orig.diag, "message_detail", None):
+            detail = intergrity_error.orig.diag.message_detail
+        else:
+            detail = str(intergrity_error.orig)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
+        
+
+
+
+# except IntegrityError as integrity_error:
+#         if hasattr(integrity_error.orig, "diag") and getattr(integrity_error.orig.diag, "message_detail", None):
+#             detail = integrity_error.orig.diag.message_detail
+#         else:
+#             detail = str(integrity_error.orig)
+#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
