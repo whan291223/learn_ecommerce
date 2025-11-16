@@ -39,7 +39,9 @@ async def get_category_by_name(category_name: str, session: AsyncSession) -> Opt
     return result.one_or_none()
 
 async def get_category_w_load_products(category_name: str, session: AsyncSession) ->  Optional[Category]:
-    statement = select(Category).where(Category.name == category_name).options(selectinload(Category.products))
+    statement = select(Category).where(Category.name == category_name).options(
+        selectinload(Category.products).selectinload(Product.reviews)
+        )
     result = await session.exec(statement)
     return result.one_or_none()
 

@@ -58,16 +58,14 @@ class ProductPublic(ProductBase): #the product that shown on page should contain
     category: CategoryPublic
     reviews: List["ReviewPublic"] = Field(default_factory=list)
 
-class ProductWitoutCategory(ProductBase): #Product list when category shown
+class ProductWithoutCategory(ProductBase): #Product list when category shown
     id: int
     reviews: List["ReviewPublic"] = Field(default_factory=list)
 
 class ProductCategoryID(ProductBase):
     id: int
     category_id: int
-    reviews: List["ReviewPublic"] = Field(default_factory=list)
-class ProductWithoutCategory(ProductBase):
-    id: int
+
 class CategoryBase(SQLModel):
     name: str
 

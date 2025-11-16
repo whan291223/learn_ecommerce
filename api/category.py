@@ -4,7 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from core.db import get_session
 from crud import crud_category
-from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic, ProductWitoutCategory
+from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic, ProductWithoutCategory
 router = APIRouter(prefix="/categories", tags=['categories'])
 
 @router.post("/", status_code=status.HTTP_201_CREATED,
@@ -47,11 +47,11 @@ async def get_category_by_id(
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
-@router.get("/{category_name}/products", response_model=List[ProductWitoutCategory])
+@router.get("/{category_name}/products", response_model=List[ProductWithoutCategory])
 async def get_category_products(
     category_name: str,
     session: AsyncSession = Depends(get_session)
-) -> List[ProductWitoutCategory]:
+) -> List[ProductWithoutCategory]:
     #step1 validate if category name is valid
     category = await crud_category.get_category_w_load_products(category_name=category_name, session=session)
     if not category:
