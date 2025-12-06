@@ -4,8 +4,8 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated = "auto")
 
-def get_password_hash(password: str) -> str:
+def get_password_hash(password: str) -> str: # adding Salt
     return pwd_context.hash(password)
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
+def verify_password(plain_password: str, hashed_password: str) -> bool: #Verify
     return pwd_context.verify(plain_password, hashed_password)
