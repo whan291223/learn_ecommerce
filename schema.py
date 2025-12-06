@@ -19,8 +19,11 @@ class UserCreate(UserBase): # use when create User
 class UserPublic(UserBase): # what public will see
     id: int
     role: str
-    reviews: List["ReviewPublic"] = Field(default_factory=list)
+    reviews: List["ReviewsOfUser"] = Field(default_factory=list)
 
+class UserPublicWithoutReview(UserBase):
+    id: int
+    role: str
 class ReviewBase(SQLModel):
     text: str
     rating: int
@@ -34,6 +37,7 @@ class ReviewsOfProduct(ReviewBase):
     user_id: int
 
 class ReviewsOfUser(ReviewBase):
+    id: int
     product_id: int
 
 class ReviewPublic(ReviewBase):

@@ -31,6 +31,11 @@ async def get_user_by_id(user_id: int, session: AsyncSession) -> Optional[User]:
     result = await session.exec(statement)
     return result.one_or_none()
 
+async def get_user_by_username(username: str, session: AsyncSession) -> Optional[User]:
+    statement = select(User).where(User.username == username).options(selectinload(User.reviews))
+    result = await session.exec(statement)
+    return result.one_or_none()
+
 async def get_user_reviews(user_id: int, session: AsyncSession) -> List[Review]:
     user_statement = select(User).where(User.id == user_id).options(selectinload(User.reviews))
     user_result = await session.exec(user_statement)

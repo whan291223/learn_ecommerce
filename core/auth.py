@@ -9,6 +9,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from decouple import config #need to install python-decouple
 from core.db import get_session
+from crud.crud_user import get_user_by_username
+
 
 SECRET_KEY = config("SECRET_KEY")
 ALGORITHM = config("ALGORITHM")
@@ -26,7 +28,7 @@ def create_accessL_token(data: dict,expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user( #to create a user need to verify 1.token 2.session
+async def get_current_user( #to create a user need to verify 1.token 2.session
     token: Annotated[str, Depends(oauth2_schema)],
     session: Annotated[Session, Depends(get_session)]
 ):
@@ -37,10 +39,13 @@ def get_current_user( #to create a user need to verify 1.token 2.session
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
+        username: str = payload.get("sub")
+        if username is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-
+    user = await get_user_by_username(username, session)
+    if user is None:
+        raise credentials_exception
+    return user
 #37.11
