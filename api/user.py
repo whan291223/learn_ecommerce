@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, status, Depends, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -7,10 +6,11 @@ from core.db import get_session
 from crud import crud_user
 from schema import UserPublic, UserCreate, ReviewPublic, UserPublicWithoutReview
 
-from typing import Annotated
-from core.auth import create_accessL_token
+from typing import Annotated, Optional, List
+from core.auth import create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 from core.security import verify_password
+from model.models import User, Review
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -67,17 +67,21 @@ async def get_user_reviews(
     except ValueError:
         raise HTTPException(status_code=404, detail=f"User id:{user_id} not found")
 
-
+@router.post("/token",response_model=dict)
 async def login_for_access_token(
-        form_data: OAuth2PasswordRequestForm,
+        form_data: OAuth2PasswordRequestForm = Depends(),
         session: AsyncSession = Depends(get_session)
 ):
-    try:
-        user = await crud_user.create_user(userdata=form_data.username, session=session) 
-        return user
-    except IntegrityError:
+    #get username
+    user: Optional[User] = await crud_user.get_user_by_username(username=form_data.username, session=session) 
+    #check if user not found or passeword is wrong
+    if not user or not verify_password(form_data.password, user.password):    
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already exists."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate" : "Bearer"}
         )
-    #TODO
+    
+    # create access token
+    access_token = create_access_token(data={"sub":user.username})
+    return {"access_token" : access_token, "token_type" : "bearer"}

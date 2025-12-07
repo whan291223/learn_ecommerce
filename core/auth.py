@@ -16,14 +16,14 @@ SECRET_KEY = config("SECRET_KEY")
 ALGORITHM = config("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-oauth2_schema = OAuth2PasswordBearer(tokenUrl="/token") #coming from fastapi
+oauth2_schema = OAuth2PasswordBearer(tokenUrl="/users/token") #coming from fastapi
 
-def create_accessL_token(data: dict,expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict,expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp":expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
