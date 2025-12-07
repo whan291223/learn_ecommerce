@@ -1,11 +1,14 @@
-from typing import List
+from typing import List, Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from core.db import get_session
+from core.auth import get_current_user
+from model.models import User
 from crud import crud_product
 from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic, ProductUpdate
+
 
 router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
@@ -27,7 +30,9 @@ async def create_new_product(
 
 @router.get("/", response_model=List[ProductPublic])
 async def get_all_product(
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
+    *,
+    _: Annotated[User, Depends(get_current_user)]
 ) -> List[ProductPublic]:
     products = await crud_product.get_all_product(session=session)
     return products
