@@ -10,6 +10,7 @@ from typing import Annotated, Optional, List
 from core.auth import create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
 from core.security import verify_password
+from core.auth import get_current_user
 from model.models import User, Review
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -66,6 +67,12 @@ async def get_user_reviews(
         return reviews
     except ValueError:
         raise HTTPException(status_code=404, detail=f"User id:{user_id} not found")
+
+@router.get("/my_session/", response_model=UserPublic)
+async def read_user_me(
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    return current_user
 
 @router.post("/token",response_model=dict)
 async def login_for_access_token(
