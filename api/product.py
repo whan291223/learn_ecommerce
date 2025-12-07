@@ -28,11 +28,9 @@ async def create_new_product(
             detail = str(integrity_error.orig)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
-@router.get("/", response_model=List[ProductPublic])
+@router.get("/", response_model=List[ProductPublic], dependencies=[Depends(get_current_user)])
 async def get_all_product(
-    session: AsyncSession = Depends(get_session),
-    *,
-    _: Annotated[User, Depends(get_current_user)]
+    session: AsyncSession = Depends(get_session)
 ) -> List[ProductPublic]:
     products = await crud_product.get_all_product(session=session)
     return products
