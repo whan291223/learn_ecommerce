@@ -48,4 +48,21 @@ async def get_current_user( #to create a user need to verify 1.token 2.session
     if user is None:
         raise credentials_exception
     return user
-#37.11
+
+def role_checker(roles: list[str]):
+    def check_roles_dependency(
+            current_user: Annotated[dict, Depends(get_current_user)]
+    ):
+        if current_user.role not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="User not authorized for this action."
+            )
+        return current_user
+    return check_roles_dependency
+
+def is_admin():
+    return role_checker("admin")
+
+def is_customer():
+    return role_checker("customer")

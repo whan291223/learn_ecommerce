@@ -102,3 +102,9 @@ Server verifies JWT + reads "sub"
 Server loads user from DB
        ↓
 Access granted ✔️
+
+
+-------------
+- chap 11
+- install httpx
+- create new .py file name https.client
