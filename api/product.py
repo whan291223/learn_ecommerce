@@ -1,5 +1,5 @@
 from typing import List, Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
@@ -8,17 +8,43 @@ from core.auth import get_current_user
 from model.models import User
 from crud import crud_product
 from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic, ProductUpdate
-
+import uuid, os #fix if user upload two image file with the same name
 
 router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly
 #  ex. .post('product/xyz') -> .post('xyz')
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=ProductCategoryID)
 async def create_new_product(
-    product_data: ProductCreate,
+    name: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    category_id: int = Form(...),
+    image: UploadFile = File(...),
     session: AsyncSession = Depends(get_session)
 ) -> ProductCategoryID: #fix add default factoty field for reviews, and use differrent schema for show only category_id
+    """Need to change the ProductCrete to multiform so that it can 
+
+    Raises:
+        HTTPException: _description_
+
+    Returns:
+        ProductCategoryID: _description_
+    """
     try:
+        os.makedirs("static/images", exist_ok=True)
+        ext = os.path.splitext(image.filename)[1]
+        filename = f"{uuid.uuid4()}{ext}"
+        image_path = f"static/images/{filename}"
+
+        with open(image_path, "wb") as f:
+            f.write(await image.read())
+        product_data = ProductCreate(
+            name=name,
+            description=description,
+            price=price,
+            category_id=category_id,
+            image_path=image_path
+        )
         new_product = await crud_product.create_product(product_data=product_data, session=session)
         return new_product
     except IntegrityError as integrity_error:
@@ -28,7 +54,8 @@ async def create_new_product(
             detail = str(integrity_error.orig)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
-@router.get("/", response_model=List[ProductPublic], dependencies=[Depends(get_current_user)])
+@router.get("/", response_model=List[ProductPublic])
+# , dependencies=[Depends(get_current_user)])
 async def get_all_product(
     session: AsyncSession = Depends(get_session)
 ) -> List[ProductPublic]:
@@ -69,10 +96,31 @@ async def delete_product(
 
 @router.put("/", response_model=ProductCategoryID)
 async def update_product(
-    product_data: ProductUpdate,
+    name: str = Form(...),
+    description: str = Form(...),
+    price: float = Form(...),
+    category_id: int = Form(...),
+    image: UploadFile|None = File(None),
     session: AsyncSession = Depends(get_session)
 ) -> ProductCategoryID:
     try:
+        image_path = None
+        if image:
+            os.makedirs("static/images", exist_ok=True)
+            ext = os.path.splitext(image.filename)[1]
+            filename = f"{uuid.uuid4()}{ext}"
+            image_path = f"static/images/{filename}"
+
+            with open(image_path, "wb") as f:
+                f.write(await image.read())
+
+        product_data = ProductUpdate(
+            name = name,
+            description = description,
+            price = price,
+            category_id = category_id,
+            image_path=image_path
+        )
         product = await crud_product.update_product(product_data=product_data, session=session)
         return product
     except ValueError:

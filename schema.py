@@ -68,6 +68,7 @@ class ProductPublic(ProductBase): #the product that shown on page should contain
 class ProductWithoutCategory(ProductBase): #Product list when category shown
     id: int
     reviews: List["ReviewPublic"] = Field(default_factory=list)
+    image_path: str|None
 
 class ProductCategoryID(ProductBase):
     id: int

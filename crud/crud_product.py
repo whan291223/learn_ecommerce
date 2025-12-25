@@ -61,7 +61,7 @@ async def update_product(product_data: ProductUpdate, session: AsyncSession) -> 
     if not product:
         raise ValueError
 
-    for key, value in product_data.model_dump().items():
+    for key, value in product_data.model_dump(exclude_none=True).items():
         setattr(product, key, value)
     
     session.add(product)
