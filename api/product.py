@@ -96,6 +96,7 @@ async def delete_product(
 
 @router.put("/", response_model=ProductCategoryID)
 async def update_product(
+    id: int = Form(...),
     name: str = Form(...),
     description: str = Form(...),
     price: float = Form(...),
@@ -115,6 +116,7 @@ async def update_product(
                 f.write(await image.read())
 
         product_data = ProductUpdate(
+            id = id,
             name = name,
             description = description,
             price = price,
