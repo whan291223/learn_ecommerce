@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
 from model.models import Category, Product
-from schema import CategoryCreate
+from schema.category_schema import CategoryCreate
 
 async def create_category(category_data: CategoryCreate, session: AsyncSession) -> Category:
     db_category = Category.model_validate(category_data)

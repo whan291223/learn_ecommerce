@@ -7,7 +7,7 @@ from core.db import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel import select
 from model.models import Product
-
+#TODO Resturcture this
 router = APIRouter(prefix="/payment", tags=["Payment"])
 
 stripe.api_key = settings.STRIPE_SECRET_KEY

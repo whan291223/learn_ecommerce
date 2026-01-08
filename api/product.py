@@ -7,7 +7,8 @@ from core.db import get_session
 from core.auth import get_current_user
 from model.models import User
 from crud import crud_product
-from schema import ProductCreate, ProductPublic, ProductCategoryID, ReviewPublic, ProductUpdate
+from schema.product_schema import ProductCreate, ProductPublic, ProductCategoryID, ProductUpdate
+from schema.review_schema import ReviewPublic
 import uuid, os #fix if user upload two image file with the same name
 
 router = APIRouter(prefix="/products", tags=["product"]) # router will initiate path for api automaticly

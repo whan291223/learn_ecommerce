@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 
 from model.models import Product, Review
-from schema import ProductCreate, ProductUpdate
+from schema.product_schema import ProductCreate, ProductUpdate
 
 async def create_product(product_data: ProductCreate, session: AsyncSession) -> Product:
     db_product = Product.model_validate(product_data)

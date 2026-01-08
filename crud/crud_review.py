@@ -4,7 +4,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.exc import IntegrityError
 from model.models import Review
-from schema import ReviewCreate
+from schema.review_schema import ReviewCreate
+
 async def create_review(review_data: ReviewCreate, session: AsyncSession) -> Review:
     db_review = Review.model_validate(review_data)
     session.add(db_review)

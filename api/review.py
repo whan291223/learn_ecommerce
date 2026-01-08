@@ -4,7 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from core.db import get_session
 from crud import crud_review
-from schema import ReviewCreate, ReviewPublic
+from schema.review_schema import ReviewCreate, ReviewPublic
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 

@@ -4,7 +4,9 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from core.db import get_session
 from crud import crud_category
-from schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic, ProductPublic, ProductWithoutCategory
+from schema.category_schema import CategoryCreate, CategoryPublic, CategoryWithProductPublic
+from schema.product_schema import ProductPublic, ProductWithoutCategory
+
 router = APIRouter(prefix="/categories", tags=['categories'])
 
 @router.post("/", status_code=status.HTTP_201_CREATED,

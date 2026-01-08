@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError
 
 from core.db import get_session
 from crud import crud_user
-from schema import UserPublic, UserCreate, ReviewPublic, UserPublicWithoutReview
-
+from schema.user_schema import UserPublic, UserCreate, UserPublicWithoutReview
+from schema.review_schema import ReviewPublic
 from typing import Annotated, Optional, List
 from core.auth import create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
