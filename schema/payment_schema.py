@@ -8,3 +8,4 @@ class CartItem(SQLModel):
 
 class CheckoutRequest(SQLModel):
     items: List[CartItem]
+    user_id: int
