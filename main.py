@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from api import user, product, category, review, payment
+from api import user, product, category, review, payment, order
 
 app = FastAPI()
 
@@ -12,6 +12,7 @@ app.include_router(product.router, prefix="/api/v1")
 app.include_router(category.router, prefix="/api/v1")
 app.include_router(review.router, prefix="/api/v1")
 app.include_router(payment.router, prefix="/api/v1")
+app.include_router(order.router, prefix="/api/v1")
 
 origins = [
     "http://localhost:5173",

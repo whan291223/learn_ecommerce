@@ -3,6 +3,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from model.models import Product, Order, OrderItem
 from schema.payment_schema import CheckoutRequest
+from datetime import datetime, timezone
 
 async def create_stripe_session(
     data: CheckoutRequest,
@@ -101,7 +102,8 @@ async def fulfill_order(session_data: dict, db: AsyncSession):
 
     # Only update the status - stripe_session_id is already set
     order.status = "paid"
-    
+    order.updated_at = datetime.now(timezone.utc)
+
     db.add(order)
     await db.commit()
 

@@ -14,6 +14,7 @@ psycopg2-binary: synchronous Python driver for postgressql ->
 
 from typing import List, Optional
 from sqlmodel import Field, Relationship, SQLModel
+from datetime import datetime, timezone
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -39,14 +40,12 @@ class Category(SQLModel, table=True):
 
     products: List["Product"] = Relationship(back_populates="category")
 
-
-
 class Review(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     text: str
     rating: int
     
-    user_id: int = Field(foreign_key="user.id") #reviews belond to user therefore it should have foreigh key here
+    user_id: int = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="reviews")
     
     product_id: int = Field(foreign_key="product.id")
@@ -60,9 +59,12 @@ class Order(SQLModel, table=True):
     status: str = "pending"
 
     stripe_session_id: Optional[str] = Field(default=None, index=True, unique=True)
+    
+    # ✅ Store in UTC, convert to Thai time when displaying
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: Optional[datetime] = Field(default=None)
 
     items: List["OrderItem"] = Relationship(back_populates="order")
-
 
 class OrderItem(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
