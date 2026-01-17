@@ -14,6 +14,8 @@ from schema.payment_schema import CheckoutRequest
 from crud.crud_payment import create_stripe_session, fulfill_order, get_order_by_stripe_session  # Import your new function
 from core.config import settings
 import stripe
+from model.models import OrderStatus
+from datetime import datetime, timezone
 router = APIRouter(prefix="/payment", tags=["Payment"])
 
 @router.post("/create-checkout-session")
@@ -45,15 +47,23 @@ async def stripe_webhook(
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid Webhook Signature")
-
+    print(event['type'])
     # Handle the event
     if event['type'] == 'checkout.session.completed':
         session_data = event['data']['object']
         # Call the CRUD function
         await fulfill_order(session_data, db)
-
+    if event["type"] == "checkout.session.expired": # TODO expired still not work
+        session_data = event["data"]["object"]
+        print("the session is expiered")
+        order = await get_order_by_stripe_session(db, session_data["id"])
+        if order and order.status == OrderStatus.pending:
+            order.status = OrderStatus.expired
+            order.expired_at = datetime.now(timezone.utc)
+            db.add(order)
+            await db.commit()
     return {"status": "success"}
-
+    
 
 @router.get("/checkout-status")
 async def checkout_status(
@@ -68,5 +78,5 @@ async def checkout_status(
     return {
         "order_id": order.id,
         "status": order.status,
-        "total_price": order.total_price_baths
+        "total_price": order.total_price_bahts
     }

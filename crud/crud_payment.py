@@ -19,13 +19,13 @@ async def create_stripe_session(
     db_products = {p.id: p for p in result.all()}
 
     line_items = []
-    total_price_baths = 0
+    total_price_bahts = 0
 
     # 2. Create Order (PENDING)
     order = Order(
         user_id=data.user_id,
         status="pending",
-        total_price_baths=0  # temp
+        total_price_bahts=0  # temp
     )
     session.add(order)
     await session.commit()
@@ -37,14 +37,14 @@ async def create_stripe_session(
         if not product:
             raise ValueError("Invalid product")
 
-        price_baths = int(product.price * 100)
-        total_price_baths += price_baths * item.quantity
+        price_bahts = int(product.price) #int(product.price * 100)
+        total_price_bahts += price_bahts * item.quantity
 
         order_item = OrderItem(
             order_id=order.id,
             product_id=product.id,
             quantity=item.quantity,
-            price_at_purchase_baths=price_baths
+            price_at_purchase_bahts=price_bahts
         )
         session.add(order_item)
 
@@ -52,13 +52,13 @@ async def create_stripe_session(
             "price_data": {
                 "currency": "usd",
                 "product_data": {"name": product.name},
-                "unit_amount": price_baths,
+                "unit_amount": price_bahts,
             },
             "quantity": item.quantity,
         })
 
     # 4. Update order total
-    order.total_price_baths = total_price_baths
+    order.total_price_bahts = total_price_bahts
     session.add(order)
     await session.commit()
 

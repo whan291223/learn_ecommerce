@@ -3,6 +3,8 @@ Generic single-database configuration with an async dbapi.
 - uv run alembic init -t async alembic
 - uv run alembic revision --autogenerate
 - uv run alembic upgrade head
+# when testing webhook need to run
+stripe listen --forward-to localhost:8000/api/v1/payment/webhook
 # change file in env
 replace 
 ```python

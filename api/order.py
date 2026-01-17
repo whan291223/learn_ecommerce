@@ -40,14 +40,14 @@ async def get_all_orders(
                 "product_id": item.product_id,
                 "product_name": product.name if product else f"Product #{item.product_id}",
                 "quantity": item.quantity,
-                "price_at_purchase_baths": item.price_at_purchase_baths
+                "price_at_purchase_bahts": item.price_at_purchase_bahts
             })
         
         orders_data.append({
             "id": order.id,
             "user_id": order.user_id,
             "username": user.username if user else None,
-            "total_price_baths": order.total_price_baths,
+            "total_price_bahts": order.total_price_bahts,
             "status": order.status,
             "stripe_session_id": order.stripe_session_id,
             "created_at": order.created_at.isoformat() if order.created_at else None,
