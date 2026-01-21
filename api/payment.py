@@ -16,16 +16,21 @@ from core.config import settings
 import stripe
 from model.models import OrderStatus
 from datetime import datetime, timezone
+from core.auth import get_current_user
+from typing import Annotated
+from model.models import User
 router = APIRouter(prefix="/payment", tags=["Payment"])
 
 @router.post("/create-checkout-session")
 async def create_checkout_session(
     data: CheckoutRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
     session: AsyncSession = Depends(get_session)
 ):
     try:
         checkout_session = await create_stripe_session(
             data=data,
+            current_user=current_user,  # 👈 pass user explicitly
             session=session,
             secret_key=settings.STRIPE_SECRET_KEY
         )

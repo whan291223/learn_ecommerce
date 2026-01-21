@@ -4,9 +4,11 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from model.models import Product, Order, OrderItem
 from schema.payment_schema import CheckoutRequest
 from datetime import datetime, timezone
+from model.models import User
 
 async def create_stripe_session(
     data: CheckoutRequest,
+    current_user: User,
     session: AsyncSession,
     secret_key: str
 ):
@@ -23,7 +25,7 @@ async def create_stripe_session(
 
     # 2. Create Order (PENDING)
     order = Order(
-        user_id=data.user_id,
+        user_id=current_user.id,
         status="pending",
         total_price_bahts=0  # temp
     )
@@ -40,7 +42,7 @@ async def create_stripe_session(
         price_bahts = int(product.price) #int(product.price * 100)
         total_price_bahts += price_bahts * item.quantity
 
-        order_item = OrderItem(
+        order_item = OrderItem( #TODO crud order
             order_id=order.id,
             product_id=product.id,
             quantity=item.quantity,
@@ -71,7 +73,7 @@ async def create_stripe_session(
         cancel_url="http://localhost:5173/cancel",
         metadata={
             "order_id": str(order.id),
-            "user_id": str(data.user_id),
+            "user_id": str(current_user.id),
         }
     )
     order.stripe_session_id = stripe_session.id
