@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from core.db import get_session
-from model.models import Order, OrderItem, User, Product
+from model.models import Order, OrderItem, User, Product, OrderStatus
 from datetime import datetime, timezone
+from core.auth import is_customer, is_admin, get_current_user
+from typing import Annotated
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -60,9 +62,13 @@ async def get_all_orders(
 @router.patch("/{order_id}/status")
 async def update_order_status(
     order_id: int,
-    new_status: str,
+    new_status: OrderStatus,
+    # current_user: Annotated[User, Depends(get_current_user)], #TODO make auth only admin
     session: AsyncSession = Depends(get_session)
 ):
+    # if current_user.role != "admin":
+    #     raise HTTPException(status_code=401, detail="Need Admin Privilaged to perform this action")
+
     """Update order status (shipped, delivered, etc.)"""
     statement = select(Order).where(Order.id == order_id)
     result = await session.exec(statement)

@@ -57,6 +57,8 @@ class OrderStatus(str, Enum):
     paid = "paid"            # webhook confirmed
     cancelled = "cancelled"  # user cancelled checkout
     expired = "expired"      # session expired / timeout
+    shipped = "shipped"
+    delivered = "delivered"
 
 class Order(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

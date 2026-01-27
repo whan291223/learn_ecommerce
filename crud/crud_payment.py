@@ -52,7 +52,7 @@ async def create_stripe_session(
 
         line_items.append({
             "price_data": {
-                "currency": "usd",
+                "currency": "usd", # Todo make this thai bahts
                 "product_data": {"name": product.name},
                 "unit_amount": price_bahts,
             },

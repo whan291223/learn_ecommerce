@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from decouple import config #need to install python-decouple
 from core.db import get_session
 from crud.crud_user import get_user_by_username
+from model.models import User
 
 
 SECRET_KEY = config("SECRET_KEY")
@@ -51,7 +52,7 @@ async def get_current_user( #to create a user need to verify 1.token 2.session
 
 def role_checker(roles: list[str]):
     def check_roles_dependency(
-            current_user: Annotated[dict, Depends(get_current_user)]
+            current_user: Annotated[User, Depends(get_current_user)]
     ):
         if current_user.role not in roles:
             raise HTTPException(
@@ -62,7 +63,7 @@ def role_checker(roles: list[str]):
     return check_roles_dependency
 
 def is_admin():
-    return role_checker("admin")
+    return role_checker(["admin"])
 
 def is_customer():
-    return role_checker("customer")
+    return role_checker(["customer"])
