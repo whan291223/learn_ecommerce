@@ -1,5 +1,9 @@
 Learning how to create the e commerce
 
+Message 401 when unauthorize mean that may be you didn't send the token yet in front end
+
+
+
 Noted 
 Fast api flow!
 

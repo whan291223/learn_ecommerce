@@ -63,12 +63,9 @@ async def get_all_orders(
 async def update_order_status(
     order_id: int,
     new_status: OrderStatus,
-    # current_user: Annotated[User, Depends(get_current_user)], #TODO make auth only admin
+    current_user: Annotated[User, Depends(is_admin())],
     session: AsyncSession = Depends(get_session)
 ):
-    # if current_user.role != "admin":
-    #     raise HTTPException(status_code=401, detail="Need Admin Privilaged to perform this action")
-
     """Update order status (shipped, delivered, etc.)"""
     statement = select(Order).where(Order.id == order_id)
     result = await session.exec(statement)
