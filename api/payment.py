@@ -52,7 +52,7 @@ async def stripe_webhook(
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid Webhook Signature")
-    print(event['type'])
+    # print(event['type']) // for debug
     # Handle the event
     if event['type'] == 'checkout.session.completed':
         session_data = event['data']['object']
@@ -60,7 +60,7 @@ async def stripe_webhook(
         await fulfill_order(session_data, db)
     if event["type"] == "checkout.session.expired": # TODO expired still not work
         session_data = event["data"]["object"]
-        print("the session is expiered")
+        # print("the session is expiered")
         order = await get_order_by_stripe_session(db, session_data["id"])
         if order and order.status == OrderStatus.pending:
             order.status = OrderStatus.expired

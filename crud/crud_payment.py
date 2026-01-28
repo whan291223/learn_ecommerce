@@ -5,7 +5,7 @@ from model.models import Product, Order, OrderItem
 from schema.payment_schema import CheckoutRequest
 from datetime import datetime, timezone
 from model.models import User
-
+from fastapi import HTTPException
 async def create_stripe_session(
     data: CheckoutRequest,
     current_user: User,
@@ -40,6 +40,7 @@ async def create_stripe_session(
             raise ValueError("Invalid product")
 
         price_bahts = int(product.price) #int(product.price * 100)
+        price_satangs = price_bahts * 100
         total_price_bahts += price_bahts * item.quantity
 
         order_item = OrderItem( #TODO crud order
@@ -52,9 +53,9 @@ async def create_stripe_session(
 
         line_items.append({
             "price_data": {
-                "currency": "usd", # Todo make this thai bahts
+                "currency": "thb",
                 "product_data": {"name": product.name},
-                "unit_amount": price_bahts,
+                "unit_amount": price_satangs, #when send to stripe need to convert to satangs first
             },
             "quantity": item.quantity,
         })
@@ -65,8 +66,9 @@ async def create_stripe_session(
     await session.commit()
 
     # 5. Create Stripe Checkout Session
-    stripe_session = await stripe.checkout.Session.create_async(
-        payment_method_types=["card"],
+    try:
+        stripe_session = await stripe.checkout.Session.create_async(
+        payment_method_types=[ "card", "promptpay"], #TODO Check if there is more way to pay
         mode="payment",
         line_items=line_items,
         success_url="http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}",
@@ -74,13 +76,17 @@ async def create_stripe_session(
         metadata={
             "order_id": str(order.id),
             "user_id": str(current_user.id),
-        }
-    )
-    order.stripe_session_id = stripe_session.id
-    session.add(order)
-    await session.commit() 
+            }
+        )
+        order.stripe_session_id = stripe_session.id
+        session.add(order)
+        await session.commit() 
 
-    return stripe_session
+        return stripe_session
+    except stripe.error.StripeError as e:
+        # print(f"Stripe Error: {e.user_message}")
+        # print(f"Error details: {e}")
+        raise HTTPException(status_code=400, detail=str(e.user_message))
 
 
 async def fulfill_order(session_data: dict, db: AsyncSession):
@@ -109,7 +115,7 @@ async def fulfill_order(session_data: dict, db: AsyncSession):
     db.add(order)
     await db.commit()
 
-    print(f"✅ Order {order_id} marked as PAID")
+    # print(f"✅ Order {order_id} marked as PAID")
 
 async def get_order_by_stripe_session(
     db: AsyncSession,

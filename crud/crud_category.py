@@ -47,3 +47,4 @@ async def get_category_w_load_products(category_name: str, session: AsyncSession
 
 
 #TODO remove category ... only if that category no longer have product!
+#TODO Check if there is any api need for admin authorization
