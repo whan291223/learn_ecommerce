@@ -21,7 +21,8 @@ async def create_product(product_data: ProductCreate, session: AsyncSession) -> 
 async def get_all_product(session: AsyncSession) -> List[Product]:
     statement = select(Product).options(
             selectinload(Product.category), 
-            selectinload(Product.reviews)
+            selectinload(Product.reviews),
+            selectinload(Product.variants)
             )
     result = await session.exec(statement)
     return result.all()

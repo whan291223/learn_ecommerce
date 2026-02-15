@@ -18,10 +18,52 @@ Fast api flow!
 
 5. main -> contain fastapi server and call "api" in main
 
+podman
+- podman machine start
+- podman ps -a
+- podman image list
+- podman pod create --name myapp-pod -p 8000:8000 -p 5173:5173
+XXXX podman run -d --pod myapp-pod --name backend -e DATABASE_URL="postgresql+psycopg://postgres:root@postgres:5432/fastapi_ecom" my-fastapi
+XXXX podman run -d --pod myapp-pod --name frontend my-react
+XXXX podman run -d --pod myapp-pod --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=fastapi_ecom -v "D:\personal_project\prime junction\code goat\db\fastapi_ecom.backup:/backup/fastapi_ecom.backup:Z" postgres:18
+- podman exec -it postgres pg_restore -U postgres -d fastapi_ecom /backup/fastapi_ecom.backup                   
+- podman run -d --pod myapp-pod --name cloudflared cloudflare/cloudflared:latest tunnel --url http://localhost:5173          
+- podman run -d --pod myapp-pod --name frontend -v ".:/app:Z" -v "/app/node_modules" my-react
+- podman run -d --pod myapp-pod --name backend -v ".:/app:Z" -e DATABASE_URL="postgresql+psycopg://postgres:root@postgres:5432/fastapi_ecom" my-fastapi
+- podman run -d --pod myapp-pod --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=fastapi_ecom -v pgdata:/var/lib/postgresql -v "D:\personal_project\prime junction\code goat\db\fastapi_ecom.backup:/tmp/fastapi_ecom.backup" postgres:18
+///////// better dev workflow
+backedn
+dev image
+podman build -t my-fastapi-dev --target dev .
+podman run -d --pod myapp-pod --name backend-dev -v ".:/app:Z" -p 5173:5173 dev-fastapi
 
-chap 8.
 
-Noted
+front end
+dev image
+podman build -t my-react-dev --target dev .
+podman run -d --pod myapp-pod --name frontend-dev -v ".:/app:Z" -p 5173:5173 my-react-dev
+
+pro image
+podman build -t my-react-prod --target prod .
+podman run -d --pod myapp-pod --name frontend -p 5173:5173 my-react-prod
+
+
+
+podman run -d --pod myapp-pod --name postgres-dev -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=root -e POSTGRES_DB=fastapi_ecom -v pgdata_dev:/var/lib/postgresql postgres:18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 cors -> cross origin Resource sharing
 make two domain link together

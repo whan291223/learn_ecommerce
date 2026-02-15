@@ -29,11 +29,25 @@ class Product(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     description: str 
-    price: float
     image_path: str|None = None
     category_id: int = Field(foreign_key="category.id")
     category: Category = Relationship(back_populates="products")
     reviews: List["Review"] = Relationship(back_populates="product")
+    variants: List["ProductVariant"] = Relationship(back_populates="product")
+
+class ProductVariant(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    
+    product_id: int = Field(foreign_key="product.id")
+    product: Optional["Product"] = Relationship(back_populates="variants")
+    
+    # Optional attributes
+    color: Optional[str] = Field(default=None, index=True)
+    size: Optional[str] = Field(default=None, index=True)
+    
+    # Sellable data
+    price: float
+    stock: int
 
 class Category(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -86,7 +100,7 @@ class OrderItem(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     order_id: int = Field(foreign_key="order.id")
 
-    product_id: int = Field(foreign_key="product.id")
+    product_variant_id: int = Field(foreign_key="productvariant.id")
     quantity: int
     price_at_purchase_bahts: int
 
