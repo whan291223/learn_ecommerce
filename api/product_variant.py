@@ -1,3 +1,6 @@
+"""
+Product Variant API Router
+"""
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel.ext.asyncio.session import AsyncSession
