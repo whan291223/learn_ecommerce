@@ -1,30 +1,21 @@
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from model.models import ProductVariant, Product
+from schema.product_variant_schema import ProductVariantCreate, ProductVariantUpdate
 
 
 async def create_variant(
-    product_id: int,
-    color: str | None,
-    size: str | None,
-    price_bahts: int,
-    stock: int,
+    variant_data: ProductVariantCreate,
     session: AsyncSession
 ) -> ProductVariant:
     
     # Make sure product exists
-    result = await session.exec(select(Product).where(Product.id == product_id))
+    result = await session.exec(select(Product).where(Product.id == variant_data.product_id))
     product = result.first()
     if not product:
         raise ValueError("Product not found")
 
-    variant = ProductVariant(
-        product_id=product_id,
-        color=color,
-        size=size,
-        price_bahts=price_bahts,
-        stock=stock
-    )
+    variant = ProductVariant.model_validate(variant_data)
 
     session.add(variant)
     await session.commit()
@@ -63,22 +54,17 @@ async def get_variants_by_product(
     return result.all()
 
 async def update_variant(
-    variant_id: int,
-    color: str | None,
-    size: str | None,
-    price_bahts: int,
-    stock: int,
+    variant_data: ProductVariantUpdate,
     session: AsyncSession
 ) -> ProductVariant:
 
-    variant = await get_variant_by_id(variant_id, session)
+    variant = await get_variant_by_id(variant_data.id, session)
     if not variant:
         raise ValueError("Variant not found")
 
-    variant.color = color
-    variant.size = size
-    variant.price_bahts = price_bahts
-    variant.stock = stock
+    for key, value in variant_data.model_dump(exclude_unset=True).items():
+        if key != "id":
+            setattr(variant, key, value)
 
     session.add(variant)
     await session.commit()

@@ -31,7 +31,7 @@ class Product(SQLModel, table=True):
     description: str 
     image_path: str|None = None
     category_id: int = Field(foreign_key="category.id")
-    category: Category = Relationship(back_populates="products")
+    category: "Category" = Relationship(back_populates="products")
     reviews: List["Review"] = Relationship(back_populates="product")
     variants: List["ProductVariant"] = Relationship(back_populates="product")
 
