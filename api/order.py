@@ -34,13 +34,13 @@ async def get_all_orders(
         # Fetch product details for each item
         items_data = []
         for item in items:
-            product_stmt = select(Product).where(Product.id == item.product_id)
+            product_stmt = select(Product).where(Product.id == item.product_variant_id)
             product_result = await session.exec(product_stmt)
             product = product_result.first()
             
             items_data.append({
-                "product_id": item.product_id,
-                "product_name": product.name if product else f"Product #{item.product_id}",
+                "product_id": item.product_variant_id,
+                "product_name": product.name if product else f"Product #{item.product_variant_id}",
                 "quantity": item.quantity,
                 "price_at_purchase_bahts": item.price_at_purchase_bahts
             })

@@ -5,8 +5,10 @@ if TYPE_CHECKING:
     from .product_schema import ProductPublic
 
 class ProductVariantBase(SQLModel):
-    color: Optional[str] = None
-    size: Optional[str] = None
+    option1_name: Optional[str] = None
+    option1_value: Optional[str] = None
+    option2_name: Optional[str] = None
+    option2_value: Optional[str] = None
     price: float
     stock: int
 

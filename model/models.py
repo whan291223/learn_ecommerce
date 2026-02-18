@@ -42,8 +42,10 @@ class ProductVariant(SQLModel, table=True):
     product: Optional["Product"] = Relationship(back_populates="variants")
     
     # Optional attributes
-    color: Optional[str] = Field(default=None, index=True)
-    size: Optional[str] = Field(default=None, index=True)
+    option1_name: Optional[str] =  Field(default=None, index=True)
+    option1_value: Optional[str] =  Field(default=None, index=True)
+    option2_name: Optional[str] =  Field(default=None, index=True)
+    option2_value: Optional[str] =  Field(default=None, index=True)
     
     # Sellable data
     price: float
