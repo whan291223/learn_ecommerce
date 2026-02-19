@@ -51,6 +51,8 @@ class ProductVariant(SQLModel, table=True):
     price: float
     stock: int
 
+    is_active: bool = Field(default=True, index=True)
+
 class Category(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)

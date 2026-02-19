@@ -35,6 +35,13 @@ async def get_all_variants(
     variants = await crud_product_variant.get_all_variants(session=session)
     return variants
 
+@router.get("/in_active", response_model=List[ProductVariantPublic])
+async def get_all_variants(
+    session: AsyncSession = Depends(get_session)
+) -> List[ProductVariantPublic]:
+    variants = await crud_product_variant.get_all_in_active_variants(session=session)
+    return variants
+
 @router.get("/{variant_id}", response_model=ProductVariantPublic)
 async def get_variant_by_id(
     variant_id: int,

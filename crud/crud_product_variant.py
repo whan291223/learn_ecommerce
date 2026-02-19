@@ -21,15 +21,17 @@ async def create_variant(
     return db_product_variant
 
 
-async def get_all_variants(
-    session: AsyncSession
-) -> list[ProductVariant]:
-
+async def get_all_variants(session: AsyncSession) -> list[ProductVariant]:
     result = await session.exec(
-        select(ProductVariant)
+        select(ProductVariant).where(ProductVariant.is_active == True)
     )
     return result.all()
 
+async def get_all_in_active_variants(session: AsyncSession) -> list[ProductVariant]:
+    result = await session.exec(
+        select(ProductVariant).where(ProductVariant.is_active == False)
+    )
+    return result.all()
 
 async def get_variant_by_id(
     variant_id: int,
@@ -45,9 +47,10 @@ async def get_variants_by_product(
     product_id: int,
     session: AsyncSession
 ) -> list[ProductVariant]:
-
     result = await session.exec(
-        select(ProductVariant).where(ProductVariant.product_id == product_id)
+        select(ProductVariant)
+        .where(ProductVariant.product_id == product_id)
+        .where(ProductVariant.is_active == True)
     )
     return result.all()
 
@@ -55,17 +58,17 @@ async def update_variant(
     variant_data: ProductVariantUpdate,
     session: AsyncSession
 ) -> ProductVariant:
-
     variant = await get_variant_by_id(variant_data.id, session)
     if not variant:
         raise ValueError("Variant not found")
 
-    db_product_variant = ProductVariant.model_validate(variant_data)
+    update_data = variant_data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(variant, key, value)
 
     session.add(variant)
     await session.commit()
     await session.refresh(variant)
-
     return variant
 
 async def delete_variant(
@@ -76,7 +79,8 @@ async def delete_variant(
     if not variant:
         raise ValueError("Variant not found")
 
-    await session.delete(variant)
+    variant.is_active = False
+    session.add(variant)
     await session.commit()
 
 async def deduct_stock( #TODO only the paid one can remove this

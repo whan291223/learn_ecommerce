@@ -9,6 +9,7 @@ class ProductVariantBase(SQLModel):
     option1_value: Optional[str] = None
     option2_name: Optional[str] = None
     option2_value: Optional[str] = None
+    is_active: bool = True
     price: float
     stock: int
 
