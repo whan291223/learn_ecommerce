@@ -2,7 +2,7 @@ from sqlmodel import SQLModel
 from typing import List
 
 class CartItem(SQLModel):
-    product_id: int
+    product_variant_id: int
     quantity: int
 
 
