@@ -18,9 +18,8 @@ router = APIRouter(prefix="/products", tags=["product"]) # router will initiate 
 async def create_new_product(
     name: str = Form(...),
     description: str = Form(...),
-    price: float = Form(...),
     category_id: int = Form(...),
-    image: UploadFile = File(...),
+    image: UploadFile|None = File(None),
     session: AsyncSession = Depends(get_session)
 ) -> ProductCategoryID: #fix add default factoty field for reviews, and use differrent schema for show only category_id
     """Need to change the ProductCrete to multiform so that it can 
@@ -32,17 +31,18 @@ async def create_new_product(
         ProductCategoryID: _description_
     """
     try:
-        os.makedirs("static/images", exist_ok=True)
-        ext = os.path.splitext(image.filename)[1]
-        filename = f"{uuid.uuid4()}{ext}"
-        image_path = f"static/images/{filename}"
+        image_path = None
+        if image:
+            os.makedirs("static/images", exist_ok=True)
+            ext = os.path.splitext(image.filename)[1]
+            filename = f"{uuid.uuid4()}{ext}"
+            image_path = f"static/images/{filename}"
 
-        with open(image_path, "wb") as f:
-            f.write(await image.read())
+            with open(image_path, "wb") as f:
+                f.write(await image.read())
         product_data = ProductCreate(
             name=name,
             description=description,
-            price=price,
             category_id=category_id,
             image_path=image_path
         )
@@ -100,7 +100,6 @@ async def update_product(
     id: int = Form(...),
     name: str = Form(...),
     description: str = Form(...),
-    price: float = Form(...),
     category_id: int = Form(...),
     image: UploadFile|None = File(None),
     session: AsyncSession = Depends(get_session)
@@ -120,7 +119,6 @@ async def update_product(
             id = id,
             name = name,
             description = description,
-            price = price,
             category_id = category_id,
             image_path=image_path
         )
