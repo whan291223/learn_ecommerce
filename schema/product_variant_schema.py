@@ -18,7 +18,9 @@ class ProductVariantCreate(ProductVariantBase):
 
 class ProductVariantUpdate(ProductVariantBase):
     id: int
-    product_id: int
+    product_id: Optional[int] = None
+    price: Optional[float] = None
+    stock: Optional[int] = None
 
 class ProductVariantPublic(ProductVariantBase):
     id: int
